@@ -3,7 +3,6 @@ import glob
 import torch
 import configs
 import warnings
-from tqdm import tqdm
 import torch.nn as nn
 from dataset import load_dataset
 from model import CatDogClassifier
@@ -13,7 +12,12 @@ warnings.filterwarnings("ignore")
 def train_model():
 
     print(f"Using device: {configs.DEVICE}")
+
     train, val = load_dataset()
+    if train is None or val is None:
+        print("Dataset is empty")
+        return None
+
     model = CatDogClassifier(
         in_channels=configs.IN_CHANNELS,
         out_channels=configs.OUT_CHANNELS,
@@ -38,9 +42,8 @@ def train_model():
 
         model.train()
         train_loss = 0.0
-        train_loop = tqdm(train, desc=f"Epoch [{epoch + 1}/{configs.EPOCHS}] (Train)", leave=False)
 
-        for images, labels in train_loop:
+        for images, labels in train:
             images = images.to(configs.DEVICE)
             labels = labels.to(configs.DEVICE)
 
@@ -51,7 +54,6 @@ def train_model():
             optimizer.step()
 
             train_loss += loss.item()
-            train_loop.set_postfix(loss=f"{loss.item():.4f}")
 
         train_avg_loss = train_loss / len(train)
 
@@ -62,8 +64,7 @@ def train_model():
 
         with torch.no_grad():
 
-            val_loop = tqdm(val, desc=f"Epoch [{epoch + 1}/{configs.EPOCHS}] (Val)", leave=False)
-            for images, labels in val_loop:
+            for images, labels in val:
                 images = images.to(configs.DEVICE)
                 labels = labels.to(configs.DEVICE)
 

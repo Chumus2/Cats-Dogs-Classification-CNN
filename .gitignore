@@ -12,6 +12,7 @@ venv
 
 # Data and models
 data/
+models/
 
 # IDE
 .idea

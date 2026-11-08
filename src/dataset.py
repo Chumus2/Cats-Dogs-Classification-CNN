@@ -33,7 +33,6 @@ def load_dataset():
 
     train_loader = DataLoader(train, configs.BATCH_SIZE, shuffle=True, num_workers=configs.NUM_WORKERS)
     val_loader = DataLoader(val, configs.BATCH_SIZE, shuffle=False, num_workers=configs.NUM_WORKERS)
-    print("Dataset loaded")
     print(f"Train size: {len(train_loader)} | Val size: {len(val_loader)}")
 
     return train_loader, val_loader

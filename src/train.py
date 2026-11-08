@@ -12,6 +12,7 @@ from model import CatDogClassifier
 warnings.filterwarnings("ignore")
 def train_model():
 
+    print(f"Using device: {configs.DEVICE}")
     train, val = load_dataset()
     model = CatDogClassifier(
         in_channels=configs.IN_CHANNELS,
@@ -37,9 +38,9 @@ def train_model():
 
         model.train()
         train_loss = 0.0
-        loop = tqdm(train, desc=f"Epoch [{epoch + 1}/{configs.EPOCHS}]", leave=False)
+        train_loop = tqdm(train, desc=f"Epoch [{epoch + 1}/{configs.EPOCHS}] (Train)", leave=False)
 
-        for images, labels in loop:
+        for images, labels in train_loop:
             images = images.to(configs.DEVICE)
             labels = labels.to(configs.DEVICE)
 
@@ -50,9 +51,41 @@ def train_model():
             optimizer.step()
 
             train_loss += loss.item()
-            loop.set_postfix(loss=f"{loss.item():.4f}")
+            train_loop.set_postfix(loss=f"{loss.item():.4f}")
 
         train_avg_loss = train_loss / len(train)
+
+        model.eval()
+        val_loss = 0.0
+        correct = 0
+        total = 0
+
+        with torch.no_grad():
+
+            val_loop = tqdm(val, desc=f"Epoch [{epoch + 1}/{configs.EPOCHS}] (Val)", leave=False)
+            for images, labels in val_loop:
+                images = images.to(configs.DEVICE)
+                labels = labels.to(configs.DEVICE)
+
+                outputs = model(images)
+                loss = crit(outputs, labels)
+                val_loss += loss.item()
+
+                _, predicted = torch.max(outputs.data, 1)
+                total += labels.size(0)
+                correct += (predicted == labels).sum().item()
+
+        val_avg_loss = val_loss / len(val)
+        val_acc = correct / total * 100
+
+        print(f"Epoch [{epoch + 1}/{configs.EPOCHS}] "
+              f"| Train Loss: {train_avg_loss:.4f} "
+              f"| Val Loss: {val_avg_loss:.4f} "
+              f"| Val Accuracy: {val_acc:.2f}%")
+
+    print("\n" + "=" * 50)
+    print("ENDING TRAINING PROCESS")
+    print("=" * 50 + "\n")
 
 
 if __name__ == "__main__":

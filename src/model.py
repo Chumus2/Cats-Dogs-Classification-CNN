@@ -16,6 +16,10 @@ class CatDogClassifier(nn.Module):
         self.conv2 = nn.Conv2d(64, 32, kernel_size, stride, padding)
         self.conv3 = nn.Conv2d(32, 16, kernel_size, stride, padding)
 
+        self.bn1 = nn.BatchNorm2d(64)
+        self.bn2 = nn.BatchNorm2d(32)
+        self.bn3 = nn.BatchNorm2d(16)
+
         self.act = nn.ReLU()
         self.flatten = nn.Flatten()
         self.pool = nn.MaxPool2d(kernel_size=2, stride=2)
@@ -24,8 +28,12 @@ class CatDogClassifier(nn.Module):
         self.fc2 = nn.Linear(256, out_channels)
 
     def forward(self, x):
-        for conv in [self.conv1, self.conv2, self.conv3]:
+        for conv, bn in zip(
+            [self.conv1, self.conv2, self.conv3],
+            [self.bn1, self.bn2, self.bn3]
+        ):
             x = conv(x)
+            x = bn(x)
             x = self.act(x)
             x = self.pool(x)
 

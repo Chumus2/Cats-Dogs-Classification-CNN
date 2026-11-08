@@ -114,7 +114,7 @@ def train_model():
             }
             model_path = os.path.join(configs.OUTPUT_DIR, f"best_model.pth")
             torch.save(checkpoint, model_path)
-            print(f"{Fore.GREEN}[Checkpoint]{Style.RESET_ALL} Improvement found! Saved new best_model.pth {Style.BRIGHT}(Val Loss: {best_val_loss:.4f})")
+            print(f"{Fore.GREEN}[Checkpoint]{Style.RESET_ALL} Improvement found! Saved new best_model.pth (Val Loss: {best_val_loss:.4f})")
         else:
             patience_counter += 1
 

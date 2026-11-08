@@ -12,7 +12,7 @@ venv
 
 # Data and models
 data/
-models/
+checkpoints/
 
 # IDE
 .idea

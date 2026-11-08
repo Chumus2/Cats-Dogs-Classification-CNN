@@ -35,6 +35,9 @@ def train_model():
     for old_checkpoint in glob.glob(os.path.join(configs.OUTPUT_DIR, "*.pth")):
         os.remove(old_checkpoint)
 
+    best_val_loss = float("inf")
+    patience_counter = 0
+
     print("\n" + "=" * 50)
     print("STARTING TRAINING PROCESS")
     print("=" * 50 + "\n")
@@ -83,6 +86,28 @@ def train_model():
               f"| Train Loss: {train_avg_loss:.4f} "
               f"| Val Loss: {val_avg_loss:.4f} "
               f"| Val Accuracy: {val_acc:.2f}%")
+
+        if val_avg_loss < best_val_loss:
+            best_val_loss = val_avg_loss
+            patience_counter = 0
+
+            checkpoint = {
+                "epoch": epoch + 1,
+                "model_state_dict": model.state_dict(),
+                "optimizer_state_dict": optimizer.state_dict(),
+                "loss": val_avg_loss,
+                "accuracy": val_acc,
+            }
+            model_path = os.path.join(configs.OUTPUT_DIR, f"model_checkpoint_epoch_{epoch + 1}.pth")
+            torch.save(checkpoint, model_path)
+            print(f"[Checkpoint] Improvement found! Saved new best_checkpoint_epoch_{epoch + 1}.pth (Val Loss: {best_val_loss:.4f})")
+        else:
+            patience_counter += 1
+
+            if patience_counter >= configs.PATIENCE:
+                print(f"[Early Stopping] Validation loss did not improve for {configs.PATIENCE} consecutive epochs. Training stopped early.")
+                break
+
 
     print("\n" + "=" * 50)
     print("ENDING TRAINING PROCESS")

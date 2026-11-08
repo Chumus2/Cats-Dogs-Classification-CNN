@@ -1,22 +1,27 @@
 import os
 import glob
+from urllib import error
+
 import torch
 import configs
 import warnings
 import torch.nn as nn
 from dataset import load_dataset
 from model import CatDogClassifier
+from colorama import Fore, Style, init
 from torch.optim.lr_scheduler import ReduceLROnPlateau
 
 
 warnings.filterwarnings("ignore")
+init(autoreset=True)
+
 def train_model():
 
     print(f"Using device: {configs.DEVICE}")
 
     train, val = load_dataset()
     if train is None or val is None:
-        print("Dataset is empty")
+        print(f"{Fore.RED}Dataset is empty")
         return None
 
     model = CatDogClassifier(
@@ -90,8 +95,8 @@ def train_model():
 
         print(f"Epoch [{epoch + 1}/{configs.EPOCHS}] "
               f"| Train Loss: {train_avg_loss:.4f} "
-              f"| Val Loss: {val_avg_loss:.4f} "
-              f"| Val Accuracy: {val_acc:.2f}%"
+              f"| {Fore.RED}Val Loss: {val_avg_loss:.4f} {Style.RESET_ALL}"
+              f"| {Fore.RED}Val Accuracy: {val_acc:.2f}% {Style.RESET_ALL}"
               f"| LR: {current_lr}")
 
         if val_avg_loss < best_val_loss:
@@ -102,23 +107,36 @@ def train_model():
                 "epoch": epoch + 1,
                 "model_state_dict": model.state_dict(),
                 "optimizer_state_dict": optimizer.state_dict(),
-                "loss": val_avg_loss,
+                "train_loss": train_avg_loss,
+                "val_loss": val_avg_loss,
                 "accuracy": val_acc,
                 "learning_rate": current_lr
             }
             model_path = os.path.join(configs.OUTPUT_DIR, f"best_model.pth")
             torch.save(checkpoint, model_path)
-            print(f"[Checkpoint] Improvement found! Saved new best_model.pth (Val Loss: {best_val_loss:.4f})")
+            print(f"{Fore.GREEN}[Checkpoint]{Style.RESET_ALL} Improvement found! Saved new best_model.pth {Style.BRIGHT}(Val Loss: {best_val_loss:.4f})")
         else:
             patience_counter += 1
 
             if patience_counter >= configs.PATIENCE:
-                print(f"[Early Stopping] Validation loss did not improve for {configs.PATIENCE} consecutive epochs. Training stopped early.")
+                print(f"{Fore.RED}[Early Stopping]{Style.RESET_ALL} Validation loss did not improve for {configs.PATIENCE} consecutive epochs. Training stopped early.")
                 break
 
     print("\n" + "=" * 50)
     print("ENDING TRAINING PROCESS")
     print("=" * 50 + "\n")
+
+    if os.path.exists(os.path.join(configs.OUTPUT_DIR, "best_model.pth")):
+        best_checkpoint = torch.load(os.path.join(configs.OUTPUT_DIR, "best_model.pth"))
+        print("Best Model:")
+        print(f"Epoch: {best_checkpoint['epoch']}/{configs.EPOCHS}")
+        print(f"Train Loss: {best_checkpoint['train_loss']:.4f}")
+        print(f"{Fore.RED}Val Loss: {best_checkpoint['val_loss']:.4f}")
+        print(f"{Fore.RED}Accuracy: {best_checkpoint['accuracy']:.2f}%")
+        print(f"Final LR: {best_checkpoint['learning_rate']:.6f}")
+        print("=" * 50 + "\n")
+    else:
+        print(f"{Fore.RED}Checkpoint not found")
 
 
 if __name__ == "__main__":

@@ -6,6 +6,7 @@ import warnings
 import torch.nn as nn
 from dataset import load_dataset
 from model import CatDogClassifier
+from torch.optim.lr_scheduler import ReduceLROnPlateau
 
 
 warnings.filterwarnings("ignore")
@@ -28,6 +29,8 @@ def train_model():
     model = model.to(configs.DEVICE)
     crit = nn.CrossEntropyLoss()
     optimizer = torch.optim.Adam(model.parameters(), lr=configs.LR)
+
+    scheduler = ReduceLROnPlateau(optimizer, mode="min", factor=configs.FACTOR, patience=configs.SCHEDULER_PATIENCE)
 
     if not os.path.exists(configs.OUTPUT_DIR):
         os.makedirs(configs.OUTPUT_DIR)
@@ -82,10 +85,14 @@ def train_model():
         val_avg_loss = val_loss / len(val)
         val_acc = correct / total * 100
 
+        scheduler.step(val_avg_loss)
+        current_lr = optimizer.param_groups[0]["lr"]
+
         print(f"Epoch [{epoch + 1}/{configs.EPOCHS}] "
               f"| Train Loss: {train_avg_loss:.4f} "
               f"| Val Loss: {val_avg_loss:.4f} "
-              f"| Val Accuracy: {val_acc:.2f}%")
+              f"| Val Accuracy: {val_acc:.2f}%"
+              f"| LR: {current_lr}")
 
         if val_avg_loss < best_val_loss:
             best_val_loss = val_avg_loss
@@ -97,17 +104,17 @@ def train_model():
                 "optimizer_state_dict": optimizer.state_dict(),
                 "loss": val_avg_loss,
                 "accuracy": val_acc,
+                "learning_rate": current_lr
             }
-            model_path = os.path.join(configs.OUTPUT_DIR, f"model_checkpoint_epoch_{epoch + 1}.pth")
+            model_path = os.path.join(configs.OUTPUT_DIR, f"best_model.pth")
             torch.save(checkpoint, model_path)
-            print(f"[Checkpoint] Improvement found! Saved new best_checkpoint_epoch_{epoch + 1}.pth (Val Loss: {best_val_loss:.4f})")
+            print(f"[Checkpoint] Improvement found! Saved new best_model.pth (Val Loss: {best_val_loss:.4f})")
         else:
             patience_counter += 1
 
             if patience_counter >= configs.PATIENCE:
                 print(f"[Early Stopping] Validation loss did not improve for {configs.PATIENCE} consecutive epochs. Training stopped early.")
                 break
-
 
     print("\n" + "=" * 50)
     print("ENDING TRAINING PROCESS")

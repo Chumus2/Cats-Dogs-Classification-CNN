@@ -2,6 +2,7 @@ import torch
 
 DATA_DIR = "../data/"
 OUTPUT_DIR = "../checkpoints/"
+DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
 IMG_WIDTH = 224
 IMG_HEIGHT = 224
 TRAIN_SIZE = 0.8
@@ -13,6 +14,7 @@ OUT_CHANNELS = 2
 KERNEL_SIZE = 3
 STRIDE = 1
 PADDING = 1
-DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
 LR = 0.001
-PATIENCE = 3
+PATIENCE = 5
+FACTOR = 0.5
+SCHEDULER_PATIENCE = 2

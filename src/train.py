@@ -1,7 +1,5 @@
 import os
 import glob
-from urllib import error
-
 import torch
 import configs
 import warnings
@@ -16,12 +14,11 @@ warnings.filterwarnings("ignore")
 init(autoreset=True)
 
 def train_model():
-
     print(f"Using device: {configs.DEVICE}")
 
     train, val = load_dataset()
     if train is None or val is None:
-        print(f"{Fore.RED}Dataset is empty")
+        print(f"{Fore.RED}[Error]{Style.RESET_ALL} Dataset is empty")
         return None
 
     model = CatDogClassifier(
@@ -119,7 +116,7 @@ def train_model():
             patience_counter += 1
 
             if patience_counter >= configs.PATIENCE:
-                print(f"{Fore.RED}[Early Stopping]{Style.RESET_ALL} Validation loss did not improve for {configs.PATIENCE} consecutive epochs. Training stopped early.")
+                print(f"{Fore.RED}[Stop]{Style.RESET_ALL} Validation loss did not improve for {configs.PATIENCE} consecutive epochs. Training stopped early.")
                 break
 
     print("\n" + "=" * 50)

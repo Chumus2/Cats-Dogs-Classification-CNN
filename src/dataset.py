@@ -1,13 +1,16 @@
 import os
 import torch
 import configs
+from colorama import Fore, Style, init
 from torchvision import datasets, transforms
 from torch.utils.data import DataLoader, Subset
 
 
+init(autoreset=True)
+
 def load_dataset():
     if not os.path.exists(configs.DATA_DIR):
-        print(f"Dataset not exist ({configs.DATA_DIR})")
+        print(f"{Fore.RED}[Error]{Style.RESET_ALL} Dataset not exist ({configs.DATA_DIR})")
         return None, None
 
     train_transformer = transforms.Compose([
@@ -36,14 +39,13 @@ def load_dataset():
 
     temp_dataset = datasets.ImageFolder(configs.DATA_DIR, transform=None)
     if len(temp_dataset) == 0:
-        print(f"Dataset is empty. In folder {configs.DATA_DIR} images not exist")
+        print(f"{Fore.RED}[Error]{Style.RESET_ALL} Dataset is empty. In folder {configs.DATA_DIR} images not exist")
         return None
 
     print(f"Classes found: {temp_dataset.classes}")
     print(f"Summary images: {len(temp_dataset)}")
 
     train_size = int(configs.TRAIN_SIZE * len(temp_dataset))
-    val_size = len(temp_dataset) - train_size
 
     indices = torch.randperm(len(temp_dataset)).tolist()
     train_indices = indices[:train_size]
@@ -57,6 +59,6 @@ def load_dataset():
 
     train_loader = DataLoader(train_subset, configs.BATCH_SIZE, shuffle=True, num_workers=configs.NUM_WORKERS)
     val_loader = DataLoader(val_subset, configs.BATCH_SIZE, shuffle=False, num_workers=configs.NUM_WORKERS)
-    print(f"Train size: {len(train_loader)} | Val size: {len(val_loader)}")
+    print(f"{Fore.GREEN}[Success]{Style.RESET_ALL} Train size: {len(train_loader)} | Val size: {len(val_loader)}")
 
     return train_loader, val_loader

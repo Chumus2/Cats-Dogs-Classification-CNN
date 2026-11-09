@@ -2,6 +2,7 @@ import torch
 
 DATA_DIR = "../data/"
 OUTPUT_DIR = "../checkpoints/"
+TEST_DIR = "../test/"
 DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
 IMG_WIDTH = 224
 IMG_HEIGHT = 224

@@ -1,8 +1,13 @@
+import os
 import torch
 
-DATA_DIR = "../data/"
-OUTPUT_DIR = "../checkpoints/"
-TEST_DIR = "../test/"
+SRC_DIR = os.path.dirname(os.path.abspath(__file__))
+ROOT_DIR = os.path.dirname(SRC_DIR)
+
+DATA_DIR = os.path.join(ROOT_DIR, "data")
+OUTPUT_DIR = os.path.join(ROOT_DIR, "checkpoints")
+TEST_DIR = os.path.join(OUTPUT_DIR, "test")
+
 DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
 IMG_WIDTH = 224
 IMG_HEIGHT = 224

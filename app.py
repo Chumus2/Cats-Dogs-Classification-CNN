@@ -3,81 +3,152 @@ import streamlit as st
 from PIL import Image
 
 
-st.set_page_config(page_title="Cat vs Dog Classifier", page_icon="😺", layout="centered")
+st.set_page_config(
+    page_title="Cat vs Dog AI Classifier",
+    page_icon="😺",
+    layout="wide",
+    initial_sidebar_state="expanded"
+)
 
 st.markdown("""
     <style>
-    .main {
-        background-color: #0e1117;
+    .stApp {
+        background: linear-gradient(135deg, #0e1117 0%, #161b22 100%);
     }
-    h1 {
-        color: #ff4b4b;
+    .main-title {
+        font-size: 2.5rem;
+        font-weight: 700;
+        background: linear-gradient(90deg, #ff4b4b, #ff80bf);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
         text-align: center;
-        font-family: 'Helvetica Neue', sans-serif;
+        margin-bottom: 0.2rem;
+    }
+    .subtitle {
+        text-align: center;
+        color: #8b949e;
+        font-size: 1.1rem;
+        margin-bottom: 2rem;
+    }
+    div.stButton > button {
+        width: 100%;
+        border-radius: 12px;
+        font-weight: 600;
+        background: linear-gradient(90deg, #ff4b4b, #ff6b6b);
+        color: white;
+        border: none;
+        padding: 0.6rem 1rem;
+        box-shadow: 0 4px 12px rgba(255, 75, 75, 0.3);
+        transition: all 0.3s ease;
+    }
+    div.stButton > button:hover {
+        background: linear-gradient(90deg, #ff2222, #ff4b4b);
+        box-shadow: 0 6px 16px rgba(255, 75, 75, 0.5);
+        transform: translateY(-2px);
     }
     [data-testid="stMetric"] {
-        background-color: #1e2530;
+        background-color: #1f242d;
+        padding: 12px;
+        border-radius: 12px;
+        border: 1px solid #30363d;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    }
+    .image-card {
+        background-color: #161b22;
         padding: 15px;
-        border-radius: 10px;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+        border-radius: 12px;
+        border: 1px solid #30363d;
+        margin-bottom: 20px;
     }
-    .stButton>button {
-        width: 100%;
-        border-radius: 8px;
-        font-weight: bold;
-        background-color: #ff4b4b;
-        color: white;
-    }
-    .stButton>button:hover {
-        background-color: #ff2222;
+    .stImage img {
+        height: 450px !important;
+        object-fit: cover !important;
+        border-radius: 8px !important;
     }
     </style>
 """, unsafe_allow_html=True)
 
-st.title("Cat vs Dog Classifier")
-st.write("Upload an image of a cat or a dog, and the model will classify it")
+st.markdown('<div class="main-title">🐾 Cat vs Dog Batch Classifier</div>', unsafe_allow_html=True)
+st.markdown('<div class="subtitle">Upload multiple images and classify them all at once!</div>', unsafe_allow_html=True)
 
 API_URL = "http://127.0.0.1:8000/predict"
+MAX_IMAGES = 3
 
 with st.sidebar:
-    st.header("Settings")
-    st.info("This model uses a custom CNN trained on Cats vs Dogs dataset.")
-    uploaded_file = st.file_uploader("Choose an image...", type=["jpg", "png", "jpeg"])
+    st.header("Control Panel")
+    st.markdown("---")
+    st.info("**Batch Mode:** Select multiple images (JPG, PNG, JPEG) to classify together.")
+    uploaded_files = st.file_uploader("Choose images...", type=["jpg", "png", "jpeg"], accept_multiple_files=True)
 
+    if uploaded_files and len(uploaded_files) > MAX_IMAGES:
+        st.error(f"Limit exceeded! You can upload a maximum of {MAX_IMAGES} images. You selected {len(uploaded_files)}.")
+        uploaded_files = uploaded_files[:MAX_IMAGES]
 
-if uploaded_file is not None:
-    col1, col2 = st.columns(2)
+    st.markdown("---")
 
-    with col1:
-        image = Image.open(uploaded_file).convert("RGB")
-        st.image(image, caption="Uploaded Image", width="stretch")
-        prediction_button = st.button("Predict", width="stretch")
+    if uploaded_files:
+        st.write(f"**Selected images:** {len(uploaded_files)}")
+        predict_button = st.button("Predict All Images")
+    else:
+        predict_button = False
 
-    with col2:
-        if prediction_button:
+    st.markdown("---")
+    st.markdown("**Stack:** PyTorch • FastAPI • Streamlit")
 
-            with st.spinner("Analyzing the image..."):
-                try:
-                    files = {"file": (uploaded_file.name, uploaded_file.getvalue(), uploaded_file.type)}
-                    response = requests.post(API_URL, files=files)
+if uploaded_files:
+    if predict_button:
+        st.markdown("### Classification Results")
 
-                    if response.status_code == 200:
-                        data = response.json()
-                        prediction = data["prediction"]
-                        confidence = data["confidence_percent"]
+        cols_per_row = 3
+        for i in range(0, len(uploaded_files), cols_per_row):
+            batch = uploaded_files[i:i + cols_per_row]
+            cols = st.columns(len(batch))
 
-                        st.success("Analysis complete!")
-                        st.balloons()
+            for idx, file in enumerate(batch):
+                with cols[idx]:
+                    st.markdown('<div class="image-card">', unsafe_allow_html=True)
+                    image = Image.open(file).convert("RGB")
+                    st.image(image, caption=file.name, width="stretch")
 
-                        col_m1, col_m2 = st.columns(2)
-                        with col_m1:
-                            st.metric(label="Prediction", value=prediction)
-                        with col_m2:
-                            st.metric(label="Confidence", value=f"{confidence}%")
+                    with st.spinner("Analyzing..."):
+                        try:
+                            files = {"file": (file.name, file.getvalue(), file.type)}
+                            response = requests.post(API_URL, files=files)
 
-                        st.progress(confidence / 100)
-                    else:
-                        st.error(f"Server error: {response.status_code}")
+                            if response.status_code == 200:
+                                data = response.json()
+                                prediction = data["prediction"]
+                                confidence = data["confidence_percent"]
 
-                except requests.exceptions.ConnectionError:
-                    st.error("Could not connect to the FastAPI backend. Make sure Uvicorn is running!")
+                                emoji = "🐱" if prediction == "Cat" else "🐶"
+                                st.markdown(f"#### {emoji} {prediction}")
+                                st.metric(label="Confidence", value=f"{confidence}%")
+                                st.progress(confidence / 100)
+                            else:
+                                st.error(f"Error {response.status_code}")
+
+                        except requests.exceptions.ConnectionError:
+                            st.error("Backend offline!")
+
+                    st.markdown('</div>', unsafe_allow_html=True)
+    else:
+        st.markdown(f"### Uploaded Images ({len(uploaded_files)})")
+        cols_per_row = 4
+
+        for i in range(0, len(uploaded_files), cols_per_row):
+            batch = uploaded_files[i:i + cols_per_row]
+            cols = st.columns(len(batch))
+
+            for idx, file in enumerate(batch):
+                with cols[idx]:
+                    image = Image.open(file).convert("RGB")
+                    st.image(image, caption=file.name, width="stretch")
+
+        st.info("Click **'Predict All Images'** in the sidebar to start batch classification!")
+else:
+    st.markdown("""
+        <div style="text-align: center; padding: 40px; border: 2px dashed #30363d; border-radius: 16px; margin-top: 30px;">
+            <h3>Please upload one or multiple images using the sidebar to get started!</h3>
+            <p style="color: #8b949e;">Supports batch selection of JPG, JPEG, and PNG files.</p>
+        </div>
+    """, unsafe_allow_html=True)

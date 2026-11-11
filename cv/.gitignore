@@ -1,18 +1,6 @@
-# Python files
-__pycache__/
-*.pyc
-*.pyo
-*.pyd
-
-# Checkpoints
-.ipynb_checkpoints/
-
 # Virtual environment
 ../venv
 
 # Data and models
 data/
 checkpoints/
-
-# IDE
-.idea

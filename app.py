@@ -71,7 +71,7 @@ st.markdown("""
 st.markdown('<div class="main-title">🐾 Cat vs Dog Batch Classifier</div>', unsafe_allow_html=True)
 st.markdown('<div class="subtitle">Upload multiple images and classify them all at once!</div>', unsafe_allow_html=True)
 
-API_URL = "http://127.0.0.1:8000/predict"
+API_URL = "http://backend:8000/predict"
 MAX_IMAGES = 3
 
 with st.sidebar:

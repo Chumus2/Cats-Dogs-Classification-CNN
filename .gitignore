@@ -1,0 +1,11 @@
+# Python files
+../__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# IDE
+.idea
+
+# Checkpoints
+.ipynb_checkpoints/

@@ -66,7 +66,7 @@ Downloaded dataset name **data** and put into cv directory.
 
 3. **Run with Docker Compose:**
 ```bash
-cd Cats-Dogs-Classification-CNN\docker
+cd docker
 docker-compose up --build
 ```
 

@@ -4,8 +4,5 @@
 *.pyo
 *.pyd
 
-# IDE
-.idea
-
 # Checkpoints
 .ipynb_checkpoints/

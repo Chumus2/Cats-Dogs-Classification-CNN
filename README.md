@@ -64,15 +64,13 @@ cd Cats_Dogs_Classification
 Link: https://www.kaggle.com/datasets/bhavikjikadara/dog-and-cat-classification-dataset
 Downloaded dataset name **data** and put into cv directory.
 
-3. Create *checkpoints* directory in **cv** and run *train.py* to build model stats.
-
-4. **Run with Docker Compose:**
+3. **Run with Docker Compose:**
 ```bash
-cd docker
+cd Cats-Dogs-Classification-CNN\docker
 docker-compose up --build
 ```
 
-5. **Access the Application:** 
+4. **Access the Application:** 
 Website: http://localhost:8501
 FastAPI documentation: http://localhost:8000/docs
 

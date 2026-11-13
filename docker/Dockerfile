@@ -10,7 +10,7 @@ RUN apt-get update && apt-get install -y \
 
 COPY docker/requirements.txt .
 RUN pip install --no-cache-dir torch torchvision -f https://download.pytorch.org/whl/torch_stable.html
-RUN pip install --no-cache-dir -r requirements_backend.txt
+RUN pip install --no-cache-dir -r requirements.txt
 
 COPY cv ./cv
 

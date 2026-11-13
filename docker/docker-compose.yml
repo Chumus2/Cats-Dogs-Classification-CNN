@@ -4,6 +4,7 @@ services:
       context: ..
       dockerfile: docker/Dockerfile
     container_name: cat_dog_trainer
+    shm_size: '2gb'
     volumes:
       - ../cv:/app/cv
     command: python cv/src/train.py
@@ -20,7 +21,8 @@ services:
     volumes:
       - ../cv:/app/cv
     depends_on:
-      - train
+      train:
+        condition: service_completed_successfully
 
   frontend:
     build:

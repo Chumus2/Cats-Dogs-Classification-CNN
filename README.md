@@ -64,13 +64,15 @@ cd Cats_Dogs_Classification
 Link: https://www.kaggle.com/datasets/bhavikjikadara/dog-and-cat-classification-dataset
 Downloaded dataset name **data** and put into cv directory.
 
-3. **Run with Docker Compose:**
+3. Run *train.py* to build model stats.
+
+4. **Run with Docker Compose:**
 ```bash
 cd docker
 docker-compose up --build
 ```
 
-4. **Access the Application:** 
+5. **Access the Application:** 
 Website: http://localhost:8501
 FastAPI documentation: http://localhost:8000/docs
 
@@ -96,12 +98,15 @@ python -m venv venv
 source venv/bin/activate
 ```
 
-4. **Install Dependencies:**
+3. **Install Dependencies:**
 ```bash
 pip install --upgrade pip
 pip install torch torchvision --index-url [https://download.pytorch.org/whl/cpu](https://download.pytorch.org/whl/cpu)
 pip install -r docker/requirements.txt
 ```
+
+4. Run *train.py* to build model stats.
+
 5. **Run the Backend and Frontend Services:**
 Open two separate terminal windows (both with your virtual environment activated) to run the microservices concurrently:
    1. *Start the FastAPI Backend:*

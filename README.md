@@ -64,7 +64,7 @@ cd Cats_Dogs_Classification
 Link: https://www.kaggle.com/datasets/bhavikjikadara/dog-and-cat-classification-dataset
 Downloaded dataset name **data** and put into cv directory.
 
-3. Run *train.py* to build model stats.
+3. Create model directory in cv and run *train.py* to build model stats.
 
 4. **Run with Docker Compose:**
 ```bash

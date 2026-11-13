@@ -64,7 +64,7 @@ cd Cats_Dogs_Classification
 Link: https://www.kaggle.com/datasets/bhavikjikadara/dog-and-cat-classification-dataset
 Downloaded dataset name **data** and put into cv directory.
 
-3. Create model directory in cv and run *train.py* to build model stats.
+3. Create *model* directory in **cv** and run *train.py* to build model stats.
 
 4. **Run with Docker Compose:**
 ```bash
@@ -105,7 +105,7 @@ pip install torch torchvision --index-url [https://download.pytorch.org/whl/cpu]
 pip install -r docker/requirements.txt
 ```
 
-4. Run *train.py* to build model stats.
+4. Create *model* directory in **cv** and run *train.py* to build model stats.
 
 5. **Run the Backend and Frontend Services:**
 Open two separate terminal windows (both with your virtual environment activated) to run the microservices concurrently:
